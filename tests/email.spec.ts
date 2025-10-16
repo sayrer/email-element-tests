@@ -1,20 +1,29 @@
 import { test, expect } from "@playwright/test";
 
-test("has title", async ({ page }) => {
+// This one just checks that local server is working
+test("Basic Check: has title", async ({ page }) => {
   await page.goto("/");
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle("It's a title");
 });
 
-test("get started link", async ({ page }) => {
-  await page.goto("https://playwright.dev/");
+test.describe("HTML email input internationalization", () => {
+  test("accepts IDN domain without punycode", async ({ page }) => {
+    await page.goto("/email.html");
+    await page.fill("#email", "user@bücher.example");
+    await page.click("button[type=submit]");
+    await expect(page.locator("#output")).toHaveText(
+      "Submitted: user@bücher.example",
+    );
+  });
 
-  // Click the get started link.
-  await page.getByRole("link", { name: "Get started" }).click();
-
-  // Expects page to have a heading with the name of Installation.
-  await expect(
-    page.getByRole("heading", { name: "Installation" }),
-  ).toBeVisible();
+  test("accepts IDN domain but converts to punycode", async ({ page }) => {
+    await page.goto("/email.html");
+    await page.fill("#email", "user@bücher.example");
+    await page.click("button[type=submit]");
+    await expect(page.locator("#output")).toHaveText(
+      "Submitted: user@xn--bcher-kva.example",
+    );
+  });
 });
