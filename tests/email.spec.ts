@@ -26,4 +26,27 @@ test.describe("HTML email input internationalization", () => {
       "Submitted: user@xn--bcher-kva.example",
     );
   });
+
+  test("rejects invalid email syntax", async ({ page }) => {
+    await page.goto("/email.html");
+    await page.fill("#email", "not-an-email");
+    const isValid = await page.$eval("#email", (el) => el.checkValidity());
+    expect(isValid).toBe(false);
+  });
+
+  test("treats IDN as valid email syntax", async ({ page }) => {
+    await page.goto("/email.html");
+    await page.fill("#email", "user@bücher.example");
+    const isValid = await page.$eval("#email", (el) => el.checkValidity());
+    expect(isValid).toBe(true);
+  });
+
+  test("accepts non-ASCII local part (if browser allows)", async ({ page }) => {
+    await page.goto("/");
+    await page.fill("#email", "δοκιμή@example.com");
+    await page.click("button[type=submit]");
+    await expect(page.locator("#output")).toHaveText(
+      "Submitted: δοκιμή@example.com",
+    );
+  });
 });
