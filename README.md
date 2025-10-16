@@ -1,5 +1,5 @@
 # email-element-tests
-Testing the HTML Email Element
+Testing the HTML Email Input Element
 
 ## Installation
 
