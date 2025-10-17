@@ -49,4 +49,13 @@ test.describe("HTML email input internationalization", () => {
       "Submitted: δοκιμή@example.com",
     );
   });
+
+  test("accepts non-ASCII in local and domain", async ({ page }) => {
+    await page.goto("/");
+    await page.fill("#email", "виктор1βετα@духовный.org");
+    await page.click("button[type=submit]");
+    await expect(page.locator("#output")).toHaveText(
+      "Submitted: виктор1βετα@духовный.org",
+    );
+  });
 });
